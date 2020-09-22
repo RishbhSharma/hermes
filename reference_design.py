@@ -6,7 +6,8 @@ from time import time,sleep
 #        self.d1=data1
 #        self.d2=data2
 
-delay_ms = 500
+delay_ms = 100
+sys_debug = True
 
 def wait(): sleep(delay_ms/1000.0)
 def wait_r(): sleep(delay_ms/1000.0*randint(1,10))
@@ -59,7 +60,7 @@ class Component:
 class System(Component):
     def __init__(self, sys_id):
         self.id = sys_id
-        self.debug = True
+        self.debug = sys_debug
         self.reg_id = None
 
         if self.debug:
@@ -97,15 +98,29 @@ class System(Component):
 class Network:
     def __init__(self, sys_ids):
         self.networks = sys_ids
+        self.size = len(sys_ids)
         self.nws = [System(id) for id in sys_ids]
 
     def report(self):
-        return list(map(s.ping() for s in self.nws))
+        return [s.ping() for s in self.nws]
+
+    def check(self):
+        print("Performing check. Number of systems =",self.size)
+
+        report = self.report()
+        print("Check complete")
+        for id, stat in zip(self.networks, report):
+            print(id,stat)
+
+        online = sum(report)
+        offline = self.size - online
+        print(online, offline, "System(s) online/offline")
+
 
 if __name__ == "__main__":
-    a = System(1)
-    b = System(5)
-    print(a.ping(),b.ping())
+    #a = System(1)
+    #b = System(5)
+    #print(a.ping(),b.ping())
 
-    n = Network([1,2,3,4,5,6,7,8,9])
-    n.report()
+    n = Network([6,7,5,3,9])
+    n.check()
